@@ -1,9 +1,23 @@
 require_relative "tile"
+require "colorize"
 class Board
-    attr_reader :empty_grid, :grid
+   
+    attr_reader :empty_grid
     def initialize
         @empty_grid = Array.new(9) {Array.new(9, :S)}
-        @grid = @empty_grid.deep_dup
+        @empty_grid.unshift((1..9).to_a)
+        @empty_grid[0].unshift(" ")
+        @empty_grid.each.with_index do |x, i|
+            if i > 0
+                x.unshift(i)
+            end
+        end
+        @tiles = Hash.new()
+    end
+    
+    def grid 
+        $grid = @empty_grid.deep_dup
+        return $grid
     end
 
     def [](pos1, pos2)
@@ -14,20 +28,35 @@ class Board
         occupied = []
         i = 0
         while i < 10
-            x = rand(0..8)
-            y = rand(0..8)
+            x = rand(1..9)
+            y = rand(1..9)
             if occupied.include?([x, y])
                 redo
             else
                 occupied << [x, y]
-                grid[x][y] = :B
+                @empty_grid[x][y] = :B
             end
             i += 1
         end
     end
 
     def render 
-        p grid 
+        $grid.each do |sub|
+            puts sub.join("\s").yellow
+        end
+    end
+
+    def create_tiles
+        i = 1
+        while i < 10
+            j = 1
+            while j < 10
+                @tiles[[i, j]] = Tile.new($grid[i][j], [i, j])
+                $grid[i][j] = "*"
+                j += 1
+            end
+            i += 1
+        end
     end
 end
 
@@ -49,3 +78,7 @@ end
 
 board = Board.new()
 board.placing_mines
+p board.empty_grid
+board.grid
+board.create_tiles
+board.render

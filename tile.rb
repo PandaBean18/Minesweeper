@@ -1,8 +1,17 @@
 class Tile 
+    attr_reader :orientation, :adjacent_mines, :value
     def initialize(sym, pos)
         @orientation = "down"
         if sym != :B   
-            @adjacent_mines = 
+            @adjacent_mines = adjacent(pos)
+        else
+            @adjacent_mines = nil
+        end
+        if !!(@adjacent_mines.to_s =~ /^\d/)
+            @value = @adjacent_mines
+        else
+            @value = 0
+        end
     end
 
     def adjacent(pos)
@@ -42,24 +51,29 @@ class Tile
             [pos[0]+1, pos[1]+1],
             [pos[0], pos[1]+1]
         ]
-        if !!(pos[0].to_s =~ /^0$/) && !!(pos[1] =~ /^0$/)
+        if !!(pos[0].to_s =~ /^1$/) && !!(pos[1].to_s =~ /^1$/)
             calc_mines(position_both_zero)
-        elsif !!(pos[0].to_s =~ /^0$/) 
+        elsif !!(pos[0].to_s =~ /^1$/) 
             calc_mines(position_x_zero)
-        elsif !!(pos[1] =~ /^0$/)
+        elsif !!(pos[1].to_s =~ /^1$/)
             calc_mines(position_y_zero)
         else
             calc_mines(positions)
         end
     end
 
-    def calc_mines(pos)
+    def calc_mines(arr)
         count = 0
-        pos.each do |subarr|
-            grid[*subarr] == :B    
-            count += 1
+        arr.each do |subarr|
+            if $grid[subarr[0]] != nil && $grid[subarr[0]][subarr[1]] == :B    
+                count += 1
+            end
         end
         return count 
+    end
+
+    def reveal 
+        @orientation = "up"
     end
 end
 
