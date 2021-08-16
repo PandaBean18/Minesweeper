@@ -13,6 +13,7 @@ class Board
             end
         end
         @tiles = Hash.new()
+        @game_over = false
     end
     
     def grid 
@@ -21,7 +22,7 @@ class Board
     end
 
     def [](pos1, pos2)
-        @empty_grid[pos1][pos2]
+        $grid[pos1][pos2]
     end
 
     def placing_mines
@@ -58,6 +59,45 @@ class Board
             i += 1
         end
     end
+
+    def run 
+        while @game_over == false && all_revealed? == false
+            pos = get_pos
+            reveal(pos)
+            board.render 
+        end
+    end
+
+    def get_pos
+        valid_inp  = false
+        str = ""
+        while !valid_inp
+            puts "please type the positions you would like to check. eg '1, 2'"
+            input = gets.chomp
+            if !valid_pos?(input)
+                puts "invalid input! (Did u put a comma?)"
+            else
+                valid_inp = true 
+                str = input 
+            end
+        end
+        arr = str.match(/^\s*(\d)\,\s*(\d)\s*$/).captures
+        pos = [arr[0].to_i, arr[1].to_i]
+        return pos 
+    end
+
+    def valid_pos?(str)
+        !!(str.match(/^\s*\d\,\s*\d\s*$/))
+    end
+
+    def reveal(pos)
+        if @empty_grid[pos[0]][pos[1]] == :B   
+            $grid[pos[0]][pos[1]] = "B".red 
+            @game_over = true 
+            puts "the position had a mine"
+            end_of_game
+        else
+
 end
 
 class Array

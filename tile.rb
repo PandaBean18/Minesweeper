@@ -1,7 +1,10 @@
 class Tile 
     attr_reader :orientation, :adjacent_mines, :value
     def initialize(sym, pos)
+        @sym = sym
+
         @orientation = "down"
+        
         if sym != :B   
             @adjacent_mines = adjacent(pos)
         else
