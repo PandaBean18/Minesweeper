@@ -2,22 +2,23 @@ require_relative "tile"
 require "colorize"
 class Board
    
-    attr_reader :empty_grid
+    #attr_reader :grid
     def initialize
-        @empty_grid = Array.new(9) {Array.new(9, :S)}
-        @empty_grid.unshift((1..9).to_a)
-        @empty_grid[0].unshift(" ")
-        @empty_grid.each.with_index do |x, i|
+        $empty_grid = Array.new(9) {Array.new(9, :S)}
+        $empty_grid.unshift((1..9).to_a)
+        $empty_grid[0].unshift(" ")
+        $empty_grid.each.with_index do |x, i|
             if i > 0
                 x.unshift(i)
             end
         end
         @tiles = Hash.new()
         @game_over = false
+        
     end
     
     def grid 
-        $grid = @empty_grid.deep_dup
+        $grid = $empty_grid.deep_dup
         return $grid
     end
 
@@ -35,7 +36,7 @@ class Board
                 redo
             else
                 occupied << [x, y]
-                @empty_grid[x][y] = :B
+                $empty_grid[x][y] = :B
             end
             i += 1
         end
@@ -67,8 +68,9 @@ class Board
     end
 
     def run 
+        create_tiles
         while @game_over == false #&& all_revealed? == false
-            p @empty_grid
+            p $empty_grid
             render 
             pos = get_pos
             reveal(pos)
@@ -80,6 +82,7 @@ class Board
         str = ""
         while !valid_inp
             puts "please type the positions you would like to check. eg '1, 2'"
+            print ">>\s"
             input = gets.chomp
             if !valid_pos?(input)
                 puts "invalid input! (Did u put a comma?)"
@@ -98,7 +101,7 @@ class Board
     end
 
     def reveal(pos)
-        if @empty_grid[pos[0]][pos[1]] == :B   
+        if $empty_grid[pos[0]][pos[1]] == :B   
             $grid[pos[0]][pos[1]] = "B".red 
             @game_over = true 
             puts ""
@@ -112,12 +115,13 @@ class Board
         @tiles.each do |x, v|
             if @tiles[x].sym == :B    
                 $grid[x[0]][x[1]] = "B".red
-            elsif @tiles[x].adjacent_mines == 0
+            elsif v.adjacent_mines == 0
                 $grid[x[0]][x[1]] = "_".yellow
             else 
                 $grid[x[0]][x[1]] = @tiles[x].adjacent_mines.to_s.green
             end
         end
+        #p @tiles
         render
     end
 
@@ -142,5 +146,4 @@ end
 board = Board.new()
 board.placing_mines
 board.grid
-board.create_tiles
 board.run

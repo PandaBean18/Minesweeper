@@ -68,7 +68,7 @@ class Tile
     def calc_mines(arr)
         count = 0
         arr.each do |subarr|
-            if $grid[subarr[0]] != nil && $grid[subarr[0]][subarr[1]] == :B    
+            if $empty_grid[subarr[0]] != nil && $empty_grid[subarr[0]][subarr[1]] == :B
                 count += 1
             end
         end
