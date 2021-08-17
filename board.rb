@@ -41,9 +41,15 @@ class Board
         end
     end
 
-    def render 
-        $grid.each do |sub|
-            puts sub.join("\s").yellow
+    def render
+        if @game_over == false 
+            $grid.each do |sub|
+                puts sub.join("\s").yellow
+            end
+        else
+            $grid.each do |sub|
+                puts sub.join("\s")
+            end
         end
     end
 
@@ -61,10 +67,11 @@ class Board
     end
 
     def run 
-        while @game_over == false && all_revealed? == false
+        while @game_over == false #&& all_revealed? == false
+            p @empty_grid
+            render 
             pos = get_pos
             reveal(pos)
-            board.render 
         end
     end
 
@@ -94,9 +101,25 @@ class Board
         if @empty_grid[pos[0]][pos[1]] == :B   
             $grid[pos[0]][pos[1]] = "B".red 
             @game_over = true 
+            puts ""
             puts "the position had a mine"
+            puts ""
             end_of_game
-        else
+        end  
+    end
+
+    def end_of_game
+        @tiles.each do |x, v|
+            if @tiles[x].sym == :B    
+                $grid[x[0]][x[1]] = "B".red
+            elsif @tiles[x].adjacent_mines == 0
+                $grid[x[0]][x[1]] = "_".yellow
+            else 
+                $grid[x[0]][x[1]] = @tiles[x].adjacent_mines.to_s.green
+            end
+        end
+        render
+    end
 
 end
 
@@ -118,7 +141,6 @@ end
 
 board = Board.new()
 board.placing_mines
-p board.empty_grid
 board.grid
 board.create_tiles
-board.render
+board.run

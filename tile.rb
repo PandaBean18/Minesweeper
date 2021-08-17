@@ -1,5 +1,5 @@
 class Tile 
-    attr_reader :orientation, :adjacent_mines, :value
+    attr_reader :orientation, :adjacent_mines, :value, :sym
     def initialize(sym, pos)
         @sym = sym
 
