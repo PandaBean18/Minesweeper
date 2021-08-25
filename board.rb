@@ -2,7 +2,6 @@ require_relative "tile"
 require "colorize"
 class Board
    
-    #attr_reader :grid
     def initialize
         $empty_grid = Array.new(9) {Array.new(9, :S)}
         $empty_grid.unshift((1..9).to_a)
@@ -44,8 +43,26 @@ class Board
 
     def render
         if @game_over == false 
+            i = 1
+            while i < $grid.length 
+                j = 1
+                while j < $grid[i].length
+                    if @tiles[[i, j]].orientation == "down"
+                        $grid[i][j] = "*".yellow
+                    else   
+                        if @tiles[[i, j]].color == "green"
+                            $grid[i][j] = @tiles[[i, j]].value.to_s.green
+                        else
+                            $grid[i][j] = "_".yellow
+                        end
+                    end
+                    j += 1
+                end
+                i += 1
+            end
+
             $grid.each do |sub|
-                puts sub.join("\s").yellow
+                puts sub.join("\s")
             end
         else
             $grid.each do |sub|
@@ -69,9 +86,9 @@ class Board
 
     def run 
         create_tiles
-        while @game_over == false #&& all_revealed? == false
-            p $empty_grid
-            render 
+        p $empty_grid
+        render
+        while @game_over == false #&& all_revealed? == false 
             pos = get_pos
             reveal(pos)
         end
@@ -108,7 +125,37 @@ class Board
             puts "the position had a mine"
             puts ""
             end_of_game
-        end  
+        else
+            i = pos[0]
+            until i == 0 || $empty_grid[i][pos[1]] == :B   
+                j = pos[1]
+                until j == 0 || $empty_grid[i][j] == :B
+                    @tiles[[i, j]].reveal
+                    j -= 1
+                end 
+                j = pos[1] + 1
+                until j >= 9 || $empty_grid[i][j] == :B
+                    @tiles[[i, j]].reveal
+                    j += 1
+                end 
+                i -= 1
+            end
+            i = pos[0] + 1
+            until i == 10 || $empty_grid[i][pos[1]] == :B
+                j = pos[1]
+                until j == 0 || $empty_grid[i][j] == :B
+                    @tiles[[i, j]].reveal
+                    j -= 1
+                end 
+                j = pos[1] + 1
+                until j == 10 || $empty_grid[i][j] == :B
+                    @tiles[[i, j]].reveal
+                    j += 1
+                end 
+                i += 1
+            end
+            render
+        end
     end
 
     def end_of_game

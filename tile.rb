@@ -1,5 +1,5 @@
 class Tile 
-    attr_reader :orientation, :adjacent_mines, :value, :sym
+    attr_reader :orientation, :adjacent_mines, :value, :sym, :color
     def initialize(sym, pos)
         @sym = sym
 
@@ -14,6 +14,16 @@ class Tile
             @value = @adjacent_mines
         else
             @value = 0
+        end
+
+        @color = nil
+        
+        if @sym == :B   
+            @color = "red"
+        elsif @value > 0
+            @color = "green"
+        else
+            @color = "yellow"
         end
     end
 
