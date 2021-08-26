@@ -23,9 +23,7 @@ class Board
         return $grid
     end
 
-    def [](pos1, pos2)
-        $grid[pos1][pos2]
-    end
+   
 
     def placing_mines
         occupied = []
