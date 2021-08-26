@@ -195,7 +195,6 @@ class Board
                 $grid[x[0]][x[1]] = @tiles[x].adjacent_mines.to_s.green
             end
         end
-        #p @tiles
         render
     end
 
