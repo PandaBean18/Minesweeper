@@ -13,6 +13,8 @@ class Board
         end
         @tiles = Hash.new()
         @game_over = false
+        @flag_count = 1
+        @flagged_pos = []
         
     end
     
@@ -47,7 +49,9 @@ class Board
             while i < $grid.length 
                 j = 1
                 while j < $grid[i].length
-                    if @tiles[[i, j]].orientation == "down"
+                    if $grid[i][j] == "F"
+                        $grid[i][j] = "F".magenta
+                    elsif @tiles[[i, j]].orientation == "down"
                         $grid[i][j] = "*".yellow
                     else   
                         if @tiles[[i, j]].color == "green"
@@ -88,9 +92,18 @@ class Board
         create_tiles
         p $empty_grid
         render
-        while @game_over == false #&& all_revealed? == false 
+        while @game_over == false && all_revealed? == false 
             pos = get_pos
-            reveal(pos)
+            if pos[0] == "r"
+                if @flagged_pos.include?(pos[1..2])
+                    puts "Can't reveal a flagged position"
+                    redo
+                else
+                    reveal(pos[1..2])
+                end
+            else   
+                flag(pos[1..2])
+            end
         end
     end
 
@@ -98,23 +111,31 @@ class Board
         valid_inp  = false
         str = ""
         while !valid_inp
-            puts "please type the positions you would like to check. eg '1, 2'"
+            puts "Please type the positions you would like to reveal or flag.\nStart with '-r' to reveal or '-f' to flag, followed by the position. eg '-r 1, 2'"
             print ">>\s"
             input = gets.chomp
-            if !valid_pos?(input)
-                puts "invalid input! (Did u put a comma?)"
-            else
+            if valid_pos?(input)
                 valid_inp = true 
                 str = input 
             end
         end
-        arr = str.match(/^\s*(\d)\,\s*(\d)\s*$/).captures
-        pos = [arr[0].to_i, arr[1].to_i]
+        arr = str.match(/^\s*\-([r f])\s+(\d)\,\s*(\d)\s*$/).captures
+        pos = [arr[0], arr[1].to_i, arr[2].to_i]
         return pos 
     end
 
     def valid_pos?(str)
-        !!(str.match(/^\s*\d\,\s*\d\s*$/))
+        if !!(str.match(/^\s*\-[r f]\s+\d\,\s*\d\s*$/)) == false
+            puts "Invalid input! (Did you put a comma?)"
+            return false
+        end
+        if str.include?("f") && @flag_count == 10
+            puts "You have run out of flags!!"
+            return false
+        else
+            puts "You have #{10 - @flag_count} flags left."
+        end
+        return true
     end
 
     def reveal(pos)
@@ -158,6 +179,13 @@ class Board
         end
     end
 
+    def flag(pos)
+        $grid[pos[0]][pos[1]] = "F"
+        @flagged_pos << pos 
+        @flag_count += 1
+        render
+    end
+
     def end_of_game
         @tiles.each do |x, v|
             if @tiles[x].sym == :B    
@@ -170,6 +198,24 @@ class Board
         end
         #p @tiles
         render
+    end
+
+    def all_revealed?
+        i = 1
+        while i < 10
+            j = 1
+            while j < 10
+                if @tiles[[i, j]].orientation == "down" && @tiles[[i, j]].sym != :B   
+                    return false
+                end
+                j += 1
+            end
+            i += 1
+        end
+        puts "Congratulations!! You have won the game!".light_cyan
+        @game_over = true 
+        render
+        return true
     end
 
 end
