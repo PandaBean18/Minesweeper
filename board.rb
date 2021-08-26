@@ -23,8 +23,6 @@ class Board
         return $grid
     end
 
-   
-
     def placing_mines
         occupied = []
         i = 0
@@ -108,6 +106,7 @@ class Board
         valid_inp  = false
         str = ""
         while !valid_inp
+			puts ""
             puts "Please type the positions you would like to reveal or flag.\nStart with '-r' to reveal or '-f' to flag, followed by the position. eg '-r 1, 2'"
             print ">>\s"
             input = gets.chomp
@@ -127,10 +126,14 @@ class Board
             return false
         end
         if str.include?("f") && @flag_count == 10
+            puts ""
             puts "You have run out of flags!!"
+            puts ""
             return false
-        else
+        elsif str.include?("f")
+			puts ""
             puts "You have #{10 - @flag_count} flags left."
+			puts ""
         end
         return true
     end
@@ -208,6 +211,7 @@ class Board
             end
             i += 1
         end
+		puts ""
         puts "Congratulations!! You have won the game!".light_cyan
         @game_over = true 
         render
