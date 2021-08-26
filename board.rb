@@ -90,7 +90,6 @@ class Board
 
     def run 
         create_tiles
-        p $empty_grid
         render
         while @game_over == false && all_revealed? == false 
             pos = get_pos
